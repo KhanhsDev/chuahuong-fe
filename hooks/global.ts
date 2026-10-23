@@ -9,9 +9,9 @@ export enum METHOD {
 export type ApiResponse<T = Record<string, unknown> | string> = {
   headers: Record<string, string>
   data: T
+  body: T
   statusCode: string
   statusCodeValue: number
-  
 }
 
 export type ApiPagedResponse<T> = {

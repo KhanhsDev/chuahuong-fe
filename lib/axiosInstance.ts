@@ -46,10 +46,10 @@ axiosInstance.interceptors.request.use((config) => {
     config.data = sanitizeBody(config.data as Record<string, unknown>)
   }
 
-  const accessToken = localStorage.getItem("accessToken")
+  const token = localStorage.getItem("token")
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
 
   return config
@@ -97,7 +97,7 @@ axiosInstance.interceptors.response.use(
 
     // Backend chưa hỗ trợ refresh token
     if (!refreshToken) {
-      localStorage.removeItem("accessToken")
+      localStorage.removeItem("token")
       mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {
         revalidate: false,
       })
@@ -119,13 +119,13 @@ axiosInstance.interceptors.response.use(
 
     try {
       const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`,
         {
           refreshToken,
         }
       )
 
-      localStorage.setItem("accessToken", data.token)
+      localStorage.setItem("token", data.token)
       if (data.refreshToken) {
         localStorage.setItem("refreshToken", data.refreshToken)
       }
@@ -133,7 +133,7 @@ axiosInstance.interceptors.response.use(
       mutate(
         AUTH_SESSION_SWR_KEY,
         {
-          accessToken: data.token,
+          token: data.token,
           refreshToken: data.refreshToken ?? "",
           user: data.user,
         },
@@ -150,7 +150,7 @@ axiosInstance.interceptors.response.use(
     } catch (err) {
       processQueue(err, null)
 
-      localStorage.removeItem("accessToken")
+      localStorage.removeItem("token")
       localStorage.removeItem("refreshToken")
 
       mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {

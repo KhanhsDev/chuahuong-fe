@@ -4,23 +4,26 @@ import useSWR, { mutate } from "swr"
 import { AUTH_SESSION_SWR_KEY } from "./index"
 
 export type AuthState = {
-  accessToken: string
+  token: string
   refreshToken: string
   user: UserResponse | null
 }
 
 export const AUTH_INITIAL_STATE: AuthState = {
-  accessToken: "",
+  token: "",
   refreshToken: "",
   user: null,
 }
-
 export function setAuthState(state: AuthState) {
-  mutate(AUTH_SESSION_SWR_KEY, state, {})
+  mutate(AUTH_SESSION_SWR_KEY, state, {
+    revalidate: false,
+  })
 }
 
 export function clearAuthState() {
-  mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {})
+  mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {
+    revalidate: false,
+  })
 }
 
 export function useSession() {
@@ -32,11 +35,11 @@ export function useSession() {
     }
   )
 
-  const accessToken = data?.accessToken
+  const token = data?.token
 
   return {
-    accessToken,
+    token,
     refreshToken: data.refreshToken,
-    isAuthenticated: !!data.accessToken,
+    isAuthenticated: !!data.token,
   }
 }

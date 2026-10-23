@@ -47,7 +47,7 @@ export function useSWRWrapper<T = Record<string, unknown>>(
 ) {
   auth = auth ?? true
 
-  const { accessToken } = useSession()
+  const { token } = useSession()
 
   return useSWR<ApiResponse<T>>(
     enable ? (key ?? "") : null,
@@ -61,8 +61,8 @@ export function useSWRWrapper<T = Record<string, unknown>>(
 
       const header = {
         ...(auth &&
-          accessToken && {
-            Authorization: `Bearer ${accessToken}`,
+          token && {
+            Authorization: `Bearer ${token}`,
           }),
         ...extraHeader,
         ...config?.extraHeader,
@@ -148,7 +148,7 @@ export const useMutation = <T = Record<string, unknown>,>(
     ...config
   }: MutationConfig
 ) => {
-  const { accessToken } = useSession()
+  const { token } = useSession()
 
   return useSWRMutation(
     key,
@@ -181,8 +181,8 @@ export const useMutation = <T = Record<string, unknown>,>(
           config.noAuth
             ? undefined
             : {
-                ...(accessToken && {
-                  Authorization: `Bearer ${accessToken}`,
+                ...(token && {
+                  Authorization: `Bearer ${token}`,
                 }),
                 ...extraHeader,
                 ...config?.extraHeader,

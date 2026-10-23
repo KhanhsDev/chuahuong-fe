@@ -22,3 +22,17 @@ export type UserResponse = BaseEntityResponse & {
   emailVerified: boolean
   phoneVerified: boolean
 }
+
+export type LandingServicePromotionResponse = Record<string, string[]>
+
+export interface ServicePromotionInput {
+  id: string
+  name: string
+  description: string
+}
+
+export type AuthResponse = {
+  token: string
+  refreshToken: string
+  user?: UserResponse | null
+}
