@@ -6,9 +6,7 @@ import { loginSchema, initialLoginValues, type LoginFormValues } from "./config"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 
-type ApiError = {
-  message?: string
-}
+
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -45,12 +43,6 @@ export default function LoginForm() {
       const path = getRedirectPath()
       router.push(path || "/")
     } catch (error) {
-      const apiError = error as ApiError
-
-      helpers.setStatus({
-        type: "error",
-        message: apiError.message || "Đăng nhập thất bại. Vui lòng thử lại.",
-      })
     } finally {
       helpers.setSubmitting(false)
     }
@@ -71,7 +63,7 @@ export default function LoginForm() {
         validate={validate}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting, status, touched, errors }) => (
+        {({ isSubmitting, touched, errors }) => (
           <Form className="space-y-4" noValidate>
             {/* Email */}
             <div className="grid gap-1.5">
@@ -157,16 +149,6 @@ export default function LoginForm() {
             >
               {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
-
-            <p className="pt-2 text-center text-sm text-gray-500">
-              Chưa có tài khoản?{" "}
-              <a
-                href="/register"
-                className="font-semibold text-emerald-700 hover:underline"
-              >
-                Đăng ký ngay
-              </a>
-            </p>
           </Form>
         )}
       </Formik>

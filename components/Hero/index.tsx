@@ -63,7 +63,6 @@ export default function Hero() {
         </div>
         {/* <BookingForm /> */}
       </Container>
-      D
     </section>
   )
 }

@@ -27,7 +27,7 @@ export default function Routes() {
   const [selected, setSelected] = useState<string>(routes[0].id)
   const [days, setDays] = useState<Day[]>([])
   const [date, setDate] = useState("")
-  const [adult, setAdult] = useState(2)
+  const [adult, setAdult] = useState(1)
   const [child, setChild] = useState(0)
   const dateInput = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -53,8 +53,6 @@ export default function Routes() {
 
   const onBook = (route: Route) => {
     if (!canBook) return
-    // TODO: chuyển sang bước nhập thông tin người mua và thanh toán
-    console.log({ route: route.id, date, adult, child })
     router.push(
       `/booking?route=${route.id}&date=${date}&adult=${adult}&child=${child}`
     )

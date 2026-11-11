@@ -118,15 +118,20 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true
 
     try {
-      const { data } = await axios.post(
+      const { data: response } = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`,
         {
           refreshToken,
         }
       )
+      const data = response.body ?? response
+
+      if (typeof data.token !== "string" || !data.token) {
+        throw new Error("Refresh response did not contain an access token")
+      }
 
       localStorage.setItem("token", data.token)
-      if (data.refreshToken) {
+      if (typeof data.refreshToken === "string" && data.refreshToken) {
         localStorage.setItem("refreshToken", data.refreshToken)
       }
 
@@ -134,8 +139,8 @@ axiosInstance.interceptors.response.use(
         AUTH_SESSION_SWR_KEY,
         {
           token: data.token,
-          refreshToken: data.refreshToken ?? "",
-          user: data.user,
+          refreshToken: data.refreshToken ?? refreshToken,
+          user: data.user ?? null,
         },
         {
           revalidate: false,

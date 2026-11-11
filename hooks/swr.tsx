@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import { toast } from "sonner"
+import { toast } from "react-toastify"
 import { fetcher } from "./fetcher"
 import { mutate, PublicConfiguration } from "swr/_internal"
 import useSWRMutation from "swr/mutation"
@@ -103,17 +103,17 @@ export function useSWRWrapper<T = Record<string, unknown>>(
       onError(err, swrKey) {
         config?.onError?.(err, swrKey, config as never)
         if (notification?.notifyOnErr && notification?.title) {
-          toast.error(notification.title, {
-            description: extractErrorMessage(err),
-          })
+          toast.error(
+            renderToastContent(notification.title, extractErrorMessage(err))
+          )
         }
       },
       onSuccess(data, swrKey) {
         config?.onSuccess?.(data, swrKey, config as never)
         if (notification && !ignoreSuccessNotification) {
-          toast.success(notification.title, {
-            description: notification.message,
-          })
+          toast.success(
+            renderToastContent(notification.title, notification.message)
+          )
         }
       },
     }
@@ -216,22 +216,29 @@ export const useMutation = <T = Record<string, unknown>,>(
       onError(err, swrKey) {
         config?.onError?.(err, swrKey, config as never)
         if (notification) {
-          toast.error(notification.title, {
-            description: extractErrorMessage(err),
-          })
+          toast.error(
+            renderToastContent(notification.title, extractErrorMessage(err))
+          )
         }
       },
       onSuccess(data, swrKey) {
         config?.onSuccess?.(data, swrKey, config as never)
         if (notification && !ignoreSuccessNotification) {
-          toast.success(notification.title, {
-            description: notification.message,
-          })
+          toast.success(
+            renderToastContent(notification.title, notification.message)
+          )
         }
       },
     }
   )
 }
+
+const renderToastContent = (title?: string, message?: string) => (
+  <div>
+    {title && <strong>{title}</strong>}
+    {message && <p>{message}</p>}
+  </div>
+)
 
 const extractErrorMessage = (err: unknown): string => {
   if (axios.isAxiosError(err)) {

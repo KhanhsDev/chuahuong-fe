@@ -38,3 +38,79 @@ export interface BookingFormProps {
   maxPerOrder?: number
   onSubmit?: (payload: BookingPayload) => Promise<void> | void
 }
+
+export type CheckinOrderStatus =
+  "valid" | "payment-pending" | "refunded" | "expired"
+
+export type CheckinErrorCode =
+  | "NOT_FOUND"
+  | "WRONG_DATE"
+  | "EXPIRED"
+  | "REFUNDED"
+  | "PAYMENT_PENDING"
+  | "QUEUE_EMPTY"
+  | "INVALID_INPUT"
+  | "RATE_LIMITED"
+  | "NETWORK"
+  | "UNKNOWN"
+
+export type ReviewErrorCode =
+  | "NOT_FOUND"
+  | "WRONG_DATE"
+  | "EXPIRED"
+  | "REFUNDED"
+  | "PAYMENT_PENDING"
+  | "ALREADY_SUBMITTED"
+  | "INVALID_REVIEW"
+  | "RATE_LIMITED"
+  | "NETWORK"
+  | "UNKNOWN"
+
+export interface CheckinOrder {
+  id: string
+  code: string
+  phone: string
+  buyerName: string
+  routeId: RouteId
+  date: string
+  adults: number
+  children: number
+  mode: BoatMode
+  status: CheckinOrderStatus
+  alreadyCheckedIn?: boolean
+}
+
+export interface MockBoat {
+  id: string
+  size: "small" | "large"
+  capacity: number
+  gate: number
+  driverPhone: string
+  queueOrder: number
+}
+
+export interface BoatAssignment {
+  id: string
+  qrCode: string
+  boat: MockBoat
+  adults: number
+  children: number
+}
+
+export interface ReviewBoat {
+  assignmentId: string
+  boat: MockBoat
+  routeId: RouteId
+  date: string
+}
+
+export interface ReviewRecord {
+  assignmentId: string
+  rating: number
+  comment: string
+  tags: string[]
+}
+
+export interface ReviewPayload {
+  reviews: ReviewRecord[]
+}

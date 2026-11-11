@@ -1,7 +1,9 @@
 import { Geist, Geist_Mono, Noto_Sans, EB_Garamond } from "next/font/google"
 import { SWRProvider } from "@/providers/swr-provider"
+import LoginModalHost from "@/components/LoginModalHost"
 
 import "./globals.css"
+import "react-toastify/dist/ReactToastify.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
@@ -25,6 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={cn(
         "antialiased",
@@ -34,9 +37,12 @@ export default function RootLayout({
         ebGaramondHeading.variable
       )}
     >
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider>
-          <SWRProvider>{children}</SWRProvider>
+          <SWRProvider>
+            {children}
+            <LoginModalHost />
+          </SWRProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -5,21 +5,27 @@ import { useMutation } from "./swr"
 import { METHOD } from "./global"
 import { AuthState, clearAuthState, setAuthState } from "./useSession"
 import _ from "lodash"
-import { formatDateToApi } from "@/lib/utils"
+import { loginModal as globalLoginModal } from "@/hooks/useLoginModal"
+
 import { AuthResponse } from "@/interface/response"
 
 export function useAuth() {
   const loginMutation = useMutation<AuthResponse>("/api/v1/auth/login", {
     url: "/api/v1/auth/login",
     method: METHOD.POST,
+    notification: {
+      title: "Đăng nhập",
+      message: "Đăng nhập thành công",
+    },
+    onSuccess: globalLoginModal.close,
   })
 
   const registerMutation = useMutation<AuthState>("/api/v1/auth/register", {
     url: "/api/v1/auth/register",
     method: METHOD.POST,
     notification: {
-      title: "Authentication",
-      message: "You have successfully registered",
+      title: "Đăng ký",
+      message: "Đăng ký thành công",
     },
   })
 
@@ -32,8 +38,8 @@ export function useAuth() {
     url: "/api/v1/auth/forgot-password",
     method: METHOD.POST,
     notification: {
-      title: "Authentication",
-      message: "If the email exists, a reset link has been sent",
+      title: "Quên mật khẩu",
+      message: "Nếu email tồn tại, một liên kết đặt lại đã được gửi",
     },
   })
 
@@ -41,29 +47,17 @@ export function useAuth() {
     url: "/api/v1/auth/logout",
     method: METHOD.POST,
     notification: {
-      title: "Authentication",
-      message: "You have successfully logged out",
+      title: "Đăng xuất",
+      message: "Bạn đã đăng xuất thành công",
     },
   })
-
-  const verifyOtpMutation = useMutation<{ resetToken: string }>(
-    "/api/v1/auth/verify-otp",
-    {
-      url: "/api/v1/auth/verify-otp",
-      method: METHOD.POST,
-      notification: {
-        title: "Authentication",
-        message: "OTP verified successfully",
-      },
-    }
-  )
 
   const resetMutation = useMutation("/api/v1/auth/reset-password", {
     url: "/api/v1/auth/reset-password",
     method: METHOD.POST,
     notification: {
-      title: "Authentication",
-      message: "Password reset successfully",
+      title: "Đặt lại mật khẩu",
+      message: "Đặt lại mật khẩu thành công",
     },
   })
 
@@ -79,10 +73,6 @@ export function useAuth() {
 
   const login = async (formValues: LoginFormValues) => {
     const response = await loginMutation.trigger(formValues)
-
-    console.log("LOGIN RESPONSE:", response)
-    console.log("RESPONSE BODY:", response?.body)
-    console.log("RESPONSE DATA:", response?.data)
 
     const authData = response?.body
 
@@ -104,8 +94,13 @@ export function useAuth() {
   }
 
   const register = async (formValues: RegisterFormValues) => {
-    const payload = _.cloneDeep(formValues)
-    payload.dateOfBirth = formatDateToApi(payload.dateOfBirth) as any
+    const payload = {
+      email: formValues.email,
+      fullName: formValues.name,
+      password: formValues.password,
+      phone: formValues.phone,
+    }
+
     const response = await registerMutation.trigger(payload)
     setAuthState(response?.body)
     localStorage.setItem("refreshToken", response?.body.refreshToken)
@@ -122,7 +117,6 @@ export function useAuth() {
       setAuthState(response?.body)
       localStorage.setItem("refreshToken", response?.body.refreshToken)
     } catch {
-      clearAuthState()
       localStorage.removeItem("refreshToken")
     }
   }
@@ -145,6 +139,7 @@ export function useAuth() {
       const refreshToken = localStorage.getItem("refreshToken")
       await logoutMutation.trigger({ refreshToken })
     } catch {}
+    localStorage.removeItem("token")
     localStorage.removeItem("refreshToken")
     sessionStorage.removeItem("auth-redirect")
   }

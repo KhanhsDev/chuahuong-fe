@@ -12,7 +12,7 @@ export type UserResponse = BaseEntityResponse & {
   id: number
   username: string
   email: string
-  fullName: string
+  name: string
   phone: string
   role: ROLE_NAME
   gender: GENDER
@@ -35,4 +35,17 @@ export type AuthResponse = {
   token: string
   refreshToken: string
   user?: UserResponse | null
+}
+
+export interface TicketCheckInResponse {
+  id: string
+  code: string
+  buyerName: string
+  routeId: string
+  date: string
+  adults: number
+  children: number
+  mode: "shared" | "private" | "charter"
+  status: "valid" | "checked_in" | "payment-pending" | "refunded" | "expired"
+  alreadyCheckedIn: boolean
 }
