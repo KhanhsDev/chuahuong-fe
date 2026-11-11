@@ -1,11 +1,54 @@
 {
-  "endOfLine": "lf",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
   "semi": false,
   "singleQuote": false,
-  "tabWidth": 2,
+  "jsxSingleQuote": false,
+  "quoteProps": "as-needed",
   "trailingComma": "es5",
-  "printWidth": 80,
-  "plugins": ["prettier-plugin-tailwindcss"],
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+  "embeddedLanguageFormatting": "auto",
+  "singleAttributePerLine": false,
+  "objectWrap": "preserve",
+
   "tailwindStylesheet": "app/globals.css",
-  "tailwindFunctions": ["cn", "cva"]
+  "tailwindFunctions": ["cn", "cva"],
+
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^@/(types|interfaces)(/.*)?$",
+    "^(\\.{1,2}/)+(types|interfaces)(/.*)?$",
+    "^@/(constants?|consts?)(/.*)?$",
+    "^(\\.{1,2}/)+(constants?|consts?)(/.*)?$",
+    "^@/(utils|helpers|lib|services|api)(/.*)?$",
+    "^(\\.{1,2}/)+(utils|helpers|lib)(/.*)?$",
+    "^@/hooks(/.*)?$",
+    "^(\\.{1,2}/)+hooks(/.*)?$",
+    "^@/(components|containers|layouts|features|modules)(/.*)?$",
+    "^(\\.{1,2}/)+(components|containers|layouts)(/.*)?$",
+    "^\\./[A-Z][^/]*$",
+    "^@/(config|configs|assets|images|icons)(/.*)?$",
+    "^(\\.{1,2}/)+(config|configs|assets|images|icons)(/.*)?$",
+    "\\.(png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf)$",
+    "\\.(css|scss|sass|less)$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrderCaseInsensitive": true,
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+
+  "overrides": [
+    { "files": "*.json", "options": { "tabWidth": 2 } },
+    { "files": "*.md", "options": { "proseWrap": "preserve", "printWidth": 80 } }
+  ]
 }
