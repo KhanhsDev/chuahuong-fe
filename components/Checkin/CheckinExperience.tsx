@@ -1,61 +1,58 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import Link from "next/link"
+import type { BoatAssignment, CheckinOrder } from '@/interface/common';
+import { zodResolver } from '@hookform/resolvers/zod';
+import dayjs from 'dayjs';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import dayjs from "dayjs"
-import { z } from "zod"
-
-import OrderSummary from "@/components/Checkin/OrderSummary"
-import TicketCard from "@/components/Checkin/TicketCard"
-import WaitingScreen from "@/components/Checkin/WaitingScreen"
-import Container from "@/components/Container"
-import type { BoatAssignment, CheckinOrder } from "@/interface/common"
 import {
   type AssignmentStatus,
   type CheckinErrorCode,
   CheckinServiceError,
   useCheckinService,
-} from "@/services/checkinService"
+} from '@/services/checkinService';
 
-import printStyles from "./TicketCard.module.css"
+import OrderSummary from '@/components/Checkin/OrderSummary';
+import TicketCard from '@/components/Checkin/TicketCard';
+import WaitingScreen from '@/components/Checkin/WaitingScreen';
+import Container from '@/components/Container';
+
+import printStyles from './TicketCard.module.css';
 
 const lookupSchema = z.object({
-  code: z.string().trim().toUpperCase().min(1, "Vui lòng nhập mã đặt vé"),
+  code: z.string().trim().toUpperCase().min(1, 'Vui lòng nhập mã đặt vé'),
   phone: z
     .string()
     .trim()
-    .regex(/^0\d{9}$/, "Số điện thoại phải có 10 số và bắt đầu bằng 0"),
-})
+    .regex(/^0\d{9}$/, 'Số điện thoại phải có 10 số và bắt đầu bằng 0'),
+});
 
-type LookupValues = z.infer<typeof lookupSchema>
-type RetryMode = "lookup" | "confirm"
+type LookupValues = z.infer<typeof lookupSchema>;
+type RetryMode = 'lookup' | 'confirm';
 
 const fieldClass =
-  "mt-1 min-h-[4.8rem] w-full rounded-xl border-2 border-black/20 bg-white px-4 py-3 text-lg text-ink outline-none focus:border-jade-700 focus:ring-4 focus:ring-jade-100"
+  'mt-1 min-h-[4.8rem] w-full rounded-xl border-2 border-black/20 bg-white px-4 py-3 text-lg text-ink outline-none focus:border-jade-700 focus:ring-4 focus:ring-jade-100';
 
 const toCheckinError = (error: unknown) => {
-  if (error instanceof CheckinServiceError) return error
+  if (error instanceof CheckinServiceError) return error;
   if (error instanceof TypeError) {
     return new CheckinServiceError(
-      "NETWORK",
-      "Mất kết nối, vui lòng ra quầy hỗ trợ để được xử lý thủ công."
-    )
+      'NETWORK',
+      'Mất kết nối, vui lòng ra quầy hỗ trợ để được xử lý thủ công.',
+    );
   }
-  return new CheckinServiceError(
-    "UNKNOWN",
-    "Đã có lỗi xảy ra. Vui lòng thử lại."
-  )
-}
+  return new CheckinServiceError('UNKNOWN', 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+};
 
 const CheckinExperience = ({
   initialCode,
   initialPhone,
 }: {
-  initialCode: string
-  initialPhone: string
+  initialCode: string;
+  initialPhone: string;
 }) => {
   const {
     register,
@@ -64,104 +61,103 @@ const CheckinExperience = ({
   } = useForm<LookupValues>({
     resolver: zodResolver(lookupSchema),
     defaultValues: { code: initialCode, phone: initialPhone },
-  })
-  const [order, setOrder] = useState<CheckinOrder | null>(null)
-  const [assignments, setAssignments] = useState<BoatAssignment[] | null>(null)
-  const [waiting, setWaiting] = useState(false)
-  const [estimatedWaitSeconds, setEstimatedWaitSeconds] = useState(12)
+  });
+  const [order, setOrder] = useState<CheckinOrder | null>(null);
+  const [assignments, setAssignments] = useState<BoatAssignment[] | null>(null);
+  const [waiting, setWaiting] = useState(false);
+  const [estimatedWaitSeconds, setEstimatedWaitSeconds] = useState(12);
   const [failure, setFailure] = useState<{
-    code: CheckinErrorCode
-    message: string
-    order?: CheckinOrder
-  } | null>(null)
-  const [retryMode, setRetryMode] = useState<RetryMode>("lookup")
-  const [lastLookup, setLastLookup] = useState<LookupValues | null>(null)
-  const [loading, setLoading] = useState(false)
-  const { lookupOrder, confirmCheckin, getAssignmentStatus } =
-    useCheckinService()
+    code: CheckinErrorCode;
+    message: string;
+    order?: CheckinOrder;
+  } | null>(null);
+  const [retryMode, setRetryMode] = useState<RetryMode>('lookup');
+  const [lastLookup, setLastLookup] = useState<LookupValues | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { lookupOrder, confirmCheckin, getAssignmentStatus } = useCheckinService();
 
   const applyAssignmentStatus = async (result: AssignmentStatus) => {
-    if (result.status === "waiting") {
-      setWaiting(true)
-      setEstimatedWaitSeconds(result.estimatedWaitSeconds)
-      return
+    if (result.status === 'waiting') {
+      setWaiting(true);
+      setEstimatedWaitSeconds(result.estimatedWaitSeconds);
+      return;
     }
-    setWaiting(false)
-    setAssignments(result.assignments)
-  }
+    setWaiting(false);
+    setAssignments(result.assignments);
+  };
 
   const lookup = async (values: LookupValues) => {
-    setLoading(true)
-    setFailure(null)
-    setOrder(null)
-    setAssignments(null)
-    setWaiting(false)
-    setLastLookup(values)
-    setRetryMode("lookup")
+    setLoading(true);
+    setFailure(null);
+    setOrder(null);
+    setAssignments(null);
+    setWaiting(false);
+    setLastLookup(values);
+    setRetryMode('lookup');
     try {
-      const foundOrder = await lookupOrder(values.code, values.phone)
-      setOrder(foundOrder)
+      const foundOrder = await lookupOrder(values.code, values.phone);
+      setOrder(foundOrder);
       if (foundOrder.alreadyCheckedIn) {
-        await applyAssignmentStatus(await getAssignmentStatus(foundOrder.id))
+        await applyAssignmentStatus(await getAssignmentStatus(foundOrder.id));
       }
     } catch (error) {
-      const serviceError = toCheckinError(error)
+      const serviceError = toCheckinError(error);
       setFailure({
         code: serviceError.code,
         message: serviceError.message,
         order: serviceError.order,
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const submitCheckin = async () => {
-    if (!order) return
-    setLoading(true)
-    setFailure(null)
-    setRetryMode("confirm")
+    if (!order) return;
+    setLoading(true);
+    setFailure(null);
+    setRetryMode('confirm');
     try {
-      await applyAssignmentStatus(await confirmCheckin(order.id))
+      await applyAssignmentStatus(await confirmCheckin(order.id));
     } catch (error) {
-      setFailureFromError(error)
+      setFailureFromError(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const setFailureFromError = (error: unknown) => {
-    const serviceError = toCheckinError(error)
+    const serviceError = toCheckinError(error);
     setFailure({
       code: serviceError.code,
       message: serviceError.message,
       order: serviceError.order,
-    })
-  }
+    });
+  };
 
   const retry = async () => {
-    setFailure(null)
-    if (retryMode === "confirm") {
-      await submitCheckin()
-      return
+    setFailure(null);
+    if (retryMode === 'confirm') {
+      await submitCheckin();
+      return;
     }
-    if (lastLookup) await lookup(lastLookup)
-  }
+    if (lastLookup) await lookup(lastLookup);
+  };
 
   useEffect(() => {
-    if (!waiting || !order) return
+    if (!waiting || !order) return;
     const timer = window.setInterval(async () => {
       try {
-        await applyAssignmentStatus(await getAssignmentStatus(order.id))
+        await applyAssignmentStatus(await getAssignmentStatus(order.id));
       } catch (error) {
-        setWaiting(false)
-        setFailureFromError(error)
+        setWaiting(false);
+        setFailureFromError(error);
       }
-    }, 5_000)
-    return () => window.clearInterval(timer)
-  }, [waiting, order, getAssignmentStatus])
+    }, 5_000);
+    return () => window.clearInterval(timer);
+  }, [waiting, order, getAssignmentStatus]);
 
-  const showNetworkError = failure?.code === "NETWORK"
+  const showNetworkError = failure?.code === 'NETWORK';
 
   return (
     <main className="min-h-screen bg-sand py-8 text-ink sm:py-12">
@@ -215,12 +211,10 @@ const CheckinExperience = ({
               <input
                 autoComplete="off"
                 aria-invalid={Boolean(errors.code)}
-                aria-describedby={
-                  errors.code ? "checkin-code-error" : undefined
-                }
+                aria-describedby={errors.code ? 'checkin-code-error' : undefined}
                 className={fieldClass}
                 placeholder="Ví dụ: CH2610001"
-                {...register("code")}
+                {...register('code')}
               />
               {errors.code?.message && (
                 <span
@@ -239,12 +233,10 @@ const CheckinExperience = ({
                 inputMode="numeric"
                 autoComplete="tel"
                 aria-invalid={Boolean(errors.phone)}
-                aria-describedby={
-                  errors.phone ? "checkin-phone-error" : undefined
-                }
+                aria-describedby={errors.phone ? 'checkin-phone-error' : undefined}
                 className={fieldClass}
                 placeholder="10 số, bắt đầu bằng 0"
-                {...register("phone")}
+                {...register('phone')}
               />
               {errors.phone?.message && (
                 <span
@@ -261,7 +253,7 @@ const CheckinExperience = ({
               disabled={isSubmitting || loading}
               className="min-h-[4.8rem] rounded-full bg-brand-600 px-6 py-3 text-lg font-extrabold text-white hover:bg-brand-700 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:cursor-wait disabled:opacity-60 sm:col-span-2"
             >
-              {loading ? "Đang tra cứu…" : "Tra cứu vé"}
+              {loading ? 'Đang tra cứu…' : 'Tra cứu vé'}
             </button>
           </form>
         </section>
@@ -281,39 +273,35 @@ const CheckinExperience = ({
           <section
             role="alert"
             className={`mt-5 rounded-3xl border-2 p-6 ${
-              failure.code === "NOT_FOUND"
-                ? "border-amber-500 bg-amber-50"
-                : "border-red-700 bg-red-50"
+              failure.code === 'NOT_FOUND'
+                ? 'border-amber-500 bg-amber-50'
+                : 'border-red-700 bg-red-50'
             }`}
           >
             <h2 className="text-2xl font-extrabold">
-              {failure.code === "NOT_FOUND"
-                ? "Chưa tìm thấy đơn vé"
-                : failure.code === "WRONG_DATE"
-                  ? "Vé không đúng ngày"
-                  : failure.code === "EXPIRED"
-                    ? "Vé đã hết hạn"
-                    : failure.code === "REFUNDED"
-                      ? "Vé đã được hoàn"
-                      : failure.code === "PAYMENT_PENDING"
-                        ? "Đơn đang chờ thanh toán"
-                        : "Chưa thể xử lý yêu cầu"}
+              {failure.code === 'NOT_FOUND'
+                ? 'Chưa tìm thấy đơn vé'
+                : failure.code === 'WRONG_DATE'
+                  ? 'Vé không đúng ngày'
+                  : failure.code === 'EXPIRED'
+                    ? 'Vé đã hết hạn'
+                    : failure.code === 'REFUNDED'
+                      ? 'Vé đã được hoàn'
+                      : failure.code === 'PAYMENT_PENDING'
+                        ? 'Đơn đang chờ thanh toán'
+                        : 'Chưa thể xử lý yêu cầu'}
             </h2>
             <p className="mt-2 text-lg">{failure.message}</p>
-            {failure.code === "NOT_FOUND" && (
-              <p className="mt-2 text-base">
-                Hãy kiểm tra lại mã/SĐT hoặc ra quầy để được hỗ trợ.
-              </p>
+            {failure.code === 'NOT_FOUND' && (
+              <p className="mt-2 text-base">Hãy kiểm tra lại mã/SĐT hoặc ra quầy để được hỗ trợ.</p>
             )}
-            {failure.code === "WRONG_DATE" && failure.order && (
+            {failure.code === 'WRONG_DATE' && failure.order && (
               <p className="mt-2 text-lg font-bold">
-                Ngày ghi trên đơn:{" "}
-                {dayjs(failure.order.date).format("DD/MM/YYYY")}. Vé không dùng
-                được ngày khác; vui lòng ra quầy mua vé mới. Vé cũ không được
-                hoàn.
+                Ngày ghi trên đơn: {dayjs(failure.order.date).format('DD/MM/YYYY')}. Vé không dùng
+                được ngày khác; vui lòng ra quầy mua vé mới. Vé cũ không được hoàn.
               </p>
             )}
-            {failure.code === "QUEUE_EMPTY" && (
+            {failure.code === 'QUEUE_EMPTY' && (
               <p className="mt-2 text-base">
                 Vui lòng chờ thêm hoặc ra quầy để nhân viên hỗ trợ xếp đò.
               </p>
@@ -321,22 +309,15 @@ const CheckinExperience = ({
           </section>
         )}
 
-        {failure?.code === "QUEUE_EMPTY" && order && !waiting && (
+        {failure?.code === 'QUEUE_EMPTY' && order && !waiting && (
           <div className="mt-5">
-            <WaitingScreen
-              estimatedWaitSeconds={12}
-              onStop={() => setFailure(null)}
-            />
+            <WaitingScreen estimatedWaitSeconds={12} onStop={() => setFailure(null)} />
           </div>
         )}
 
         {order && !assignments && !waiting && !loading && !failure && (
           <div className="mt-5">
-            <OrderSummary
-              order={order}
-              onConfirm={submitCheckin}
-              isLoading={loading}
-            />
+            <OrderSummary order={order} onConfirm={submitCheckin} isLoading={loading} />
           </div>
         )}
 
@@ -356,9 +337,7 @@ const CheckinExperience = ({
                 <p className="text-sm font-bold tracking-widest text-jade-700 uppercase">
                   Bước 3 · Kết quả phân đò
                 </p>
-                <h2 className="mt-1 text-3xl font-extrabold">
-                  Vé đò của đoàn bạn
-                </h2>
+                <h2 className="mt-1 text-3xl font-extrabold">Vé đò của đoàn bạn</h2>
               </div>
               <button
                 type="button"
@@ -383,7 +362,7 @@ const CheckinExperience = ({
         )}
       </Container>
     </main>
-  )
-}
+  );
+};
 
-export default CheckinExperience
+export default CheckinExperience;

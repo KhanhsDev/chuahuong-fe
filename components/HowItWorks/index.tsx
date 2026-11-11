@@ -1,13 +1,11 @@
-import Container from "@/components/Container"
-import SectionHeading from "@/components/SectionHeading"
-import { steps } from "@/data/content"
+import { steps } from '@/data/content';
+
+import Container from '@/components/Container';
+import SectionHeading from '@/components/SectionHeading';
 
 export default function HowItWorks() {
   return (
-    <section
-      id="cach-dat-ve"
-      className="border-y border-black/5 bg-white py-16 sm:py-24"
-    >
+    <section id="cach-dat-ve" className="border-y border-black/5 bg-white py-16 sm:py-24">
       <Container>
         <SectionHeading
           center
@@ -27,5 +25,5 @@ export default function HowItWorks() {
         </ol>
       </Container>
     </section>
-  )
+  );
 }

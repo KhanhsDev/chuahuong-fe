@@ -1,11 +1,12 @@
-import Container from "@/components/Container"
-import SectionHeading from "@/components/SectionHeading"
-import { prices, vnd } from "@/data/content"
+import { prices, vnd } from '@/data/content';
+
+import Container from '@/components/Container';
+import SectionHeading from '@/components/SectionHeading';
 
 const rows = [
-  { label: "Vé đò người lớn", ...prices.adult },
-  { label: "Vé đò trẻ em", ...prices.child },
-]
+  { label: 'Vé đò người lớn', ...prices.adult },
+  { label: 'Vé đò trẻ em', ...prices.child },
+];
 
 export default function Pricing() {
   return (
@@ -44,5 +45,5 @@ export default function Pricing() {
         </div>
       </Container>
     </section>
-  )
+  );
 }

@@ -1,47 +1,49 @@
-"use client"
+'use client';
 
-import { useEffect } from "react"
-import { SWRConfig } from "swr"
-import { ToastContainer } from "react-toastify"
-import { fetcher } from "@/lib/fetcher"
-import { restoreAuthState, setAuthState } from "@/hooks/useSession"
-import axiosInstance from "@/lib/axiosInstance"
-import type { ApiResponse } from "@/hooks/global"
-import type { UserResponse } from "@/interface/response"
+import type { UserResponse } from '@/interface/response';
+import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import { SWRConfig } from 'swr';
+
+import axiosInstance from '@/lib/axiosInstance';
+import { fetcher } from '@/lib/fetcher';
+
+import type { ApiResponse } from '@/hooks/global';
+import { restoreAuthState, setAuthState } from '@/hooks/useSession';
 
 export function SWRProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const token = restoreAuthState()
+    const token = restoreAuthState();
 
-    if (!token) return
+    if (!token) return;
 
-    let isActive = true
+    let isActive = true;
 
     axiosInstance
-      .get<ApiResponse<UserResponse>>("/api/v1/auth/me")
+      .get<ApiResponse<UserResponse>>('/api/v1/auth/me')
       .then(({ data }) => {
-        if (!isActive) return
+        if (!isActive) return;
 
         if (!data.body) {
-          throw new Error("User profile response is empty")
+          throw new Error('User profile response is empty');
         }
 
         setAuthState({
-          token: localStorage.getItem("token") ?? token,
-          refreshToken: localStorage.getItem("refreshToken") ?? "",
+          token: localStorage.getItem('token') ?? token,
+          refreshToken: localStorage.getItem('refreshToken') ?? '',
           user: data.body,
-        })
+        });
       })
       .catch((error: unknown) => {
         if (isActive) {
-          console.error("Failed to restore the current user session:", error)
+          console.error('Failed to restore the current user session:', error);
         }
-      })
+      });
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
   return (
     <SWRConfig
@@ -54,5 +56,5 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
       {children}
       <ToastContainer position="top-right" autoClose={5000} />
     </SWRConfig>
-  )
+  );
 }

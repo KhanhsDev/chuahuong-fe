@@ -1,4 +1,4 @@
-import { Field, ErrorMessage } from "formik"
+import { ErrorMessage, Field } from 'formik';
 
 const PasswordField = ({
   name,
@@ -8,17 +8,17 @@ const PasswordField = ({
   onToggle,
   hasError,
 }: {
-  name: string
-  label: string
-  placeholder: string
-  show: boolean
-  onToggle: () => void
-  hasError: boolean
+  name: string;
+  label: string;
+  placeholder: string;
+  show: boolean;
+  onToggle: () => void;
+  hasError: boolean;
 }) => {
-  const inputClass = (hasError: boolean, extra = "") =>
+  const inputClass = (hasError: boolean, extra = '') =>
     `h-11 w-full rounded-lg border px-3 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-emerald-600 ${extra} ${
-      hasError ? "border-red-500" : "border-gray-300"
-    }`
+      hasError ? 'border-red-500' : 'border-gray-300'
+    }`;
   return (
     <div className="grid gap-1.5">
       <label htmlFor={name} className="text-sm font-medium text-gray-700">
@@ -28,10 +28,10 @@ const PasswordField = ({
         <Field
           id={name}
           name={name}
-          type={show ? "text" : "password"}
+          type={show ? 'text' : 'password'}
           autoComplete="new-password"
           placeholder={placeholder}
-          className={inputClass(hasError, "pr-14")}
+          className={inputClass(hasError, 'pr-14')}
         />
         {/* <button
           type="button"
@@ -41,12 +41,8 @@ const PasswordField = ({
           {show ? "Ẩn" : "Hiện"}
         </button> */}
       </div>
-      <ErrorMessage
-        name={name}
-        component="p"
-        className="text-xs text-red-600"
-      />
+      <ErrorMessage name={name} component="p" className="text-xs text-red-600" />
     </div>
-  )
-}
-export default PasswordField
+  );
+};
+export default PasswordField;

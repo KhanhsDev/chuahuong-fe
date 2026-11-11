@@ -3,9 +3,9 @@ export default function StarRating({
   onChange,
   errorId,
 }: {
-  value: number
-  onChange: (rating: number) => void
-  errorId?: string
+  value: number;
+  onChange: (rating: number) => void;
+  errorId?: string;
 }) {
   return (
     <div
@@ -23,13 +23,13 @@ export default function StarRating({
           onClick={() => onChange(rating)}
           className={`min-h-[4.8rem] min-w-[4.8rem] rounded-xl border-2 text-3xl font-bold focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-700 ${
             value >= rating
-              ? "border-amber-600 bg-amber-100 text-amber-900"
-              : "border-black/20 bg-white text-black/50"
+              ? 'border-amber-600 bg-amber-100 text-amber-900'
+              : 'border-black/20 bg-white text-black/50'
           }`}
         >
           <span aria-hidden="true">★</span>
         </button>
       ))}
     </div>
-  )
+  );
 }

@@ -1,10 +1,9 @@
-import dayjs from "dayjs"
-import { QRCodeSVG } from "qrcode.react"
+import { routes } from '@/data/content';
+import type { BoatAssignment, CheckinOrder } from '@/interface/common';
+import dayjs from 'dayjs';
+import { QRCodeSVG } from 'qrcode.react';
 
-import { routes } from "@/data/content"
-import type { BoatAssignment, CheckinOrder } from "@/interface/common"
-
-import styles from "./TicketCard.module.css"
+import styles from './TicketCard.module.css';
 
 export default function TicketCard({
   assignment,
@@ -12,12 +11,12 @@ export default function TicketCard({
   index,
   total,
 }: {
-  assignment: BoatAssignment
-  order: CheckinOrder
-  index: number
-  total: number
+  assignment: BoatAssignment;
+  order: CheckinOrder;
+  index: number;
+  total: number;
 }) {
-  const route = routes.find((candidate) => candidate.id === order.routeId)
+  const route = routes.find((candidate) => candidate.id === order.routeId);
 
   return (
     <article
@@ -66,11 +65,11 @@ export default function TicketCard({
         </p>
         <p>
           <strong>Tuyến: </strong>
-          {route?.name ?? "Tuyến tham quan"}
+          {route?.name ?? 'Tuyến tham quan'}
         </p>
         <p>
           <strong>Ngày đi: </strong>
-          {dayjs(order.date).format("DD/MM/YYYY")}
+          {dayjs(order.date).format('DD/MM/YYYY')}
         </p>
         <p>
           <strong>Số khách: </strong>
@@ -81,7 +80,7 @@ export default function TicketCard({
         Ra đúng cổng, tìm đò có số hiệu này, đưa vé cho người lái đò quét.
       </p>
     </article>
-  )
+  );
 }
 
 function NumberPanel({ label, value }: { label: string; value: string }) {
@@ -94,5 +93,5 @@ function NumberPanel({ label, value }: { label: string; value: string }) {
         {value}
       </strong>
     </div>
-  )
+  );
 }

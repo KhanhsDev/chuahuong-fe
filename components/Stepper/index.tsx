@@ -5,11 +5,11 @@ const Stepper = ({
   canIncrease,
   name,
 }: {
-  value: number
-  onChange: (v: number) => void
-  min?: number
-  canIncrease: boolean
-  name: string
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  canIncrease: boolean;
+  name: string;
 }) => {
   return (
     <div className="flex items-center gap-[1.2rem]">
@@ -38,6 +38,6 @@ const Stepper = ({
         +
       </button>
     </div>
-  )
-}
-export default Stepper
+  );
+};
+export default Stepper;

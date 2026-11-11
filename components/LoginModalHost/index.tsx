@@ -1,15 +1,16 @@
-"use client"
+'use client';
 
-import LoginForm from "@/components/LoginForm"
-import ModalProvider from "@/components/ModalProvider"
-import { loginModal, useLoginModalOpen } from "@/hooks/useLoginModal"
+import { loginModal, useLoginModalOpen } from '@/hooks/useLoginModal';
+
+import LoginForm from '@/components/LoginForm';
+import ModalProvider from '@/components/ModalProvider';
 
 export default function LoginModalHost() {
-  const isOpen = useLoginModalOpen()
+  const isOpen = useLoginModalOpen();
 
   return (
     <ModalProvider show={isOpen} onClose={loginModal.close}>
       <LoginForm />
     </ModalProvider>
-  )
+  );
 }

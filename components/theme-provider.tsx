@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import * as React from 'react';
 
 function ThemeProvider({
   children,
@@ -16,13 +16,13 @@ function ThemeProvider({
       disableTransitionOnChange
       scriptProps={{
         ...scriptProps,
-        type: typeof window === "undefined" ? "text/javascript" : "text/plain",
+        type: typeof window === 'undefined' ? 'text/javascript' : 'text/plain',
       }}
       {...props}
     >
       {children}
     </NextThemesProvider>
-  )
+  );
 }
 
-export { ThemeProvider }
+export { ThemeProvider };

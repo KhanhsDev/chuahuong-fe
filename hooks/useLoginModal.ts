@@ -1,37 +1,37 @@
-"use client"
+'use client';
 
-import { useSyncExternalStore } from "react"
+import { useSyncExternalStore } from 'react';
 
-let isLoginModalOpen = false
+let isLoginModalOpen = false;
 
-const listeners = new Set<() => void>()
+const listeners = new Set<() => void>();
 
 const notifyListeners = () => {
-  listeners.forEach((listener) => listener())
-}
+  listeners.forEach((listener) => listener());
+};
 
 export const loginModal = {
   open() {
-    if (isLoginModalOpen) return
+    if (isLoginModalOpen) return;
 
-    isLoginModalOpen = true
-    notifyListeners()
+    isLoginModalOpen = true;
+    notifyListeners();
   },
   close() {
-    if (!isLoginModalOpen) return
+    if (!isLoginModalOpen) return;
 
-    isLoginModalOpen = false
-    notifyListeners()
+    isLoginModalOpen = false;
+    notifyListeners();
   },
-}
+};
 
 export const useLoginModalOpen = () => {
   return useSyncExternalStore(
     (listener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
     () => isLoginModalOpen,
-    () => false
-  )
-}
+    () => false,
+  );
+};

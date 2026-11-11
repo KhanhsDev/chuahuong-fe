@@ -1,52 +1,42 @@
-"use client"
+'use client';
 
-import React, { Fragment, useEffect } from "react"
-import {
-  Dialog,
-  Transition,
-  DialogPanel,
-  TransitionChild,
-} from "@headlessui/react"
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
+import clsx from 'clsx';
+import React, { Fragment, useEffect } from 'react';
 
-import clsx from "clsx"
-import X from "@/assets/svg/material-symbols-x-circle.svg"
+import X from '@/assets/svg/material-symbols-x-circle.svg';
 
 interface ModalProviderProps {
-  show?: boolean
-  onClose?: (show: boolean) => void
-  children: React.ReactNode
-  dialogClass?: string
-  closeBtn?: boolean
-  unmount?: boolean
+  show?: boolean;
+  onClose?: (show: boolean) => void;
+  children: React.ReactNode;
+  dialogClass?: string;
+  closeBtn?: boolean;
+  unmount?: boolean;
 }
 
 const ModalProvider = (props: ModalProviderProps) => {
   const handleClose = () => {
-    props.onClose?.(false)
-  }
+    props.onClose?.(false);
+  };
 
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && props.show) {
-        handleClose()
+      if (event.key === 'Escape' && props.show) {
+        handleClose();
       }
-    }
+    };
 
-    document.addEventListener("keydown", handleEscKey)
+    document.addEventListener('keydown', handleEscKey);
 
     return () => {
-      document.removeEventListener("keydown", handleEscKey)
-    }
-  }, [props.show])
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [props.show]);
 
   return (
     <Transition appear show={props.show || false} as={Fragment}>
-      <Dialog
-        unmount={props.unmount}
-        as="div"
-        className="relative z-[100]"
-        onClose={handleClose}
-      >
+      <Dialog unmount={props.unmount} as="div" className="relative z-[100]" onClose={handleClose}>
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
@@ -73,7 +63,7 @@ const ModalProvider = (props: ModalProviderProps) => {
               <DialogPanel
                 className={clsx(
                   `modal-dialog shadow-base-1 w-fit transform overflow-hidden rounded-[0.8rem] text-left align-middle transition-all`,
-                  props.dialogClass
+                  props.dialogClass,
                 )}
               >
                 {props?.closeBtn && (
@@ -91,7 +81,7 @@ const ModalProvider = (props: ModalProviderProps) => {
         </div>
       </Dialog>
     </Transition>
-  )
-}
+  );
+};
 
-export default ModalProvider
+export default ModalProvider;

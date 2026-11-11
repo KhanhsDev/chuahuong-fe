@@ -1,52 +1,49 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Formik, Form, Field, ErrorMessage, type FormikHelpers } from "formik"
-import { loginSchema, initialLoginValues, type LoginFormValues } from "./config"
-import { useAuth } from "@/hooks/useAuth"
-import { useRouter } from "next/navigation"
+import { ErrorMessage, Field, Form, Formik, type FormikHelpers } from 'formik';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
+import { useAuth } from '@/hooks/useAuth';
 
+import { initialLoginValues, type LoginFormValues, loginSchema } from './config';
 
 export default function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const { login, getRedirectPath } = useAuth()
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, getRedirectPath } = useAuth();
+  const router = useRouter();
 
   const validate = (values: LoginFormValues) => {
-    const result = loginSchema.safeParse(values)
+    const result = loginSchema.safeParse(values);
 
     if (result.success) {
-      return {}
+      return {};
     }
 
-    const errors: Partial<Record<keyof LoginFormValues, string>> = {}
+    const errors: Partial<Record<keyof LoginFormValues, string>> = {};
 
     result.error.issues.forEach((issue) => {
-      const field = issue.path[0] as keyof LoginFormValues
+      const field = issue.path[0] as keyof LoginFormValues;
 
       if (field && !errors[field]) {
-        errors[field] = issue.message
+        errors[field] = issue.message;
       }
-    })
+    });
 
-    return errors
-  }
+    return errors;
+  };
 
-  const handleSubmit = async (
-    values: LoginFormValues,
-    helpers: FormikHelpers<LoginFormValues>
-  ) => {
+  const handleSubmit = async (values: LoginFormValues, helpers: FormikHelpers<LoginFormValues>) => {
     try {
-      await login(values)
+      await login(values);
 
-      const path = getRedirectPath()
-      router.push(path || "/")
+      const path = getRedirectPath();
+      router.push(path || '/');
     } catch (error) {
     } finally {
-      helpers.setSubmitting(false)
+      helpers.setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-[400px] rounded-2xl bg-white p-6 shadow-lg">
@@ -67,10 +64,7 @@ export default function LoginForm() {
           <Form className="space-y-4" noValidate>
             {/* Email */}
             <div className="grid gap-1.5">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email
               </label>
 
@@ -81,26 +75,17 @@ export default function LoginForm() {
                 autoComplete="email"
                 placeholder="example@email.com"
                 className={`h-11 w-full rounded-lg border px-3 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-emerald-600 ${
-                  touched.email && errors.email
-                    ? "border-red-500"
-                    : "border-gray-300"
+                  touched.email && errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
 
-              <ErrorMessage
-                name="email"
-                component="p"
-                className="text-xs text-red-600"
-              />
+              <ErrorMessage name="email" component="p" className="text-xs text-red-600" />
             </div>
 
             {/* Password */}
             <div className="grid gap-1.5">
               <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">
                   Mật khẩu
                 </label>
 
@@ -116,13 +101,11 @@ export default function LoginForm() {
                 <Field
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Nhập mật khẩu"
                   className={`h-11 w-full rounded-lg border px-3 pr-20 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-emerald-600 ${
-                    touched.password && errors.password
-                      ? "border-red-500"
-                      : "border-gray-300"
+                    touched.password && errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
 
@@ -131,15 +114,11 @@ export default function LoginForm() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 text-xs font-medium text-gray-500 hover:text-emerald-700"
                 >
-                  {showPassword ? "Ẩn" : "Hiện"}
+                  {showPassword ? 'Ẩn' : 'Hiện'}
                 </button>
               </div>
 
-              <ErrorMessage
-                name="password"
-                component="p"
-                className="text-xs text-red-600"
-              />
+              <ErrorMessage name="password" component="p" className="text-xs text-red-600" />
             </div>
 
             <button
@@ -147,11 +126,11 @@ export default function LoginForm() {
               disabled={isSubmitting}
               className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-lg bg-emerald-700 px-4 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
+              {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </Form>
         )}
       </Formik>
     </div>
-  )
+  );
 }

@@ -1,138 +1,136 @@
-"use client"
+'use client';
 
-import axios from "axios"
-import { mutate } from "swr"
+import axios from 'axios';
+import { mutate } from 'swr';
 
-import { AUTH_SESSION_SWR_KEY } from "@/hooks"
-import { AUTH_INITIAL_STATE } from "@/hooks/useSession"
+import { AUTH_SESSION_SWR_KEY } from '@/hooks';
+import { AUTH_INITIAL_STATE } from '@/hooks/useSession';
 
 const sanitizeBody = (
-  body: Record<string, unknown> | FormData | undefined
+  body: Record<string, unknown> | FormData | undefined,
 ): Record<string, unknown> | FormData | undefined => {
-  if (!body || body instanceof FormData) return body
+  if (!body || body instanceof FormData) return body;
 
   const sanitizeValue = (value: unknown): unknown => {
-    if (value === null || value === undefined) return undefined
+    if (value === null || value === undefined) return undefined;
 
-    if (typeof value === "string") return value.trim()
+    if (typeof value === 'string') return value.trim();
 
     if (Array.isArray(value)) {
-      return value
-        .map(sanitizeValue)
-        .filter((v) => v !== null && v !== undefined)
+      return value.map(sanitizeValue).filter((v) => v !== null && v !== undefined);
     }
 
-    if (typeof value === "object") {
-      return sanitizeBody(value as Record<string, unknown>)
+    if (typeof value === 'object') {
+      return sanitizeBody(value as Record<string, unknown>);
     }
 
-    return value
-  }
+    return value;
+  };
 
   return Object.fromEntries(
     Object.entries(body)
       .map(([key, value]) => [key, sanitizeValue(value)])
-      .filter(([, value]) => value !== undefined)
-  )
-}
+      .filter(([, value]) => value !== undefined),
+  );
+};
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
-})
+});
 
 axiosInstance.interceptors.request.use((config) => {
   if (config.data && !(config.data instanceof FormData)) {
-    config.data = sanitizeBody(config.data as Record<string, unknown>)
+    config.data = sanitizeBody(config.data as Record<string, unknown>);
   }
 
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem('token');
 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  return config
-})
+  return config;
+});
 
-let isRefreshing = false
+let isRefreshing = false;
 
 let failedQueue: Array<{
-  resolve: (token: string) => void
-  reject: (err: unknown) => void
-}> = []
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
 
 const processQueue = (error: unknown, token: string | null) => {
   failedQueue.forEach((p) => {
     if (error) {
-      p.reject(error)
+      p.reject(error);
     } else {
-      p.resolve(token!)
+      p.resolve(token!);
     }
-  })
+  });
 
-  failedQueue = []
-}
+  failedQueue = [];
+};
 
 axiosInstance.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    const originalRequest = error.config
-    const status = error.response?.status
+    const originalRequest = error.config;
+    const status = error.response?.status;
 
     if (status === 403) {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
     if (status !== 401) {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
     if (originalRequest?._retry) {
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
-    const refreshToken = localStorage.getItem("refreshToken")
+    const refreshToken = localStorage.getItem('refreshToken');
 
     // Backend chưa hỗ trợ refresh token
     if (!refreshToken) {
-      localStorage.removeItem("token")
+      localStorage.removeItem('token');
       mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {
         revalidate: false,
-      })
+      });
 
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
 
     if (isRefreshing) {
       return new Promise<string>((resolve, reject) => {
-        failedQueue.push({ resolve, reject })
+        failedQueue.push({ resolve, reject });
       }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`
-        return axiosInstance(originalRequest)
-      })
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return axiosInstance(originalRequest);
+      });
     }
 
-    originalRequest._retry = true
-    isRefreshing = true
+    originalRequest._retry = true;
+    isRefreshing = true;
 
     try {
       const { data: response } = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`,
         {
           refreshToken,
-        }
-      )
-      const data = response.body ?? response
+        },
+      );
+      const data = response.body ?? response;
 
-      if (typeof data.token !== "string" || !data.token) {
-        throw new Error("Refresh response did not contain an access token")
+      if (typeof data.token !== 'string' || !data.token) {
+        throw new Error('Refresh response did not contain an access token');
       }
 
-      localStorage.setItem("token", data.token)
-      if (typeof data.refreshToken === "string" && data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken)
+      localStorage.setItem('token', data.token);
+      if (typeof data.refreshToken === 'string' && data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
       }
 
       mutate(
@@ -144,29 +142,29 @@ axiosInstance.interceptors.response.use(
         },
         {
           revalidate: false,
-        }
-      )
+        },
+      );
 
-      processQueue(null, data.token)
+      processQueue(null, data.token);
 
-      originalRequest.headers.Authorization = `Bearer ${data.token}`
+      originalRequest.headers.Authorization = `Bearer ${data.token}`;
 
-      return axiosInstance(originalRequest)
+      return axiosInstance(originalRequest);
     } catch (err) {
-      processQueue(err, null)
+      processQueue(err, null);
 
-      localStorage.removeItem("token")
-      localStorage.removeItem("refreshToken")
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
 
       mutate(AUTH_SESSION_SWR_KEY, AUTH_INITIAL_STATE, {
         revalidate: false,
-      })
+      });
 
-      return Promise.reject(err)
+      return Promise.reject(err);
     } finally {
-      isRefreshing = false
+      isRefreshing = false;
     }
-  }
-)
+  },
+);
 
-export default axiosInstance
+export default axiosInstance;

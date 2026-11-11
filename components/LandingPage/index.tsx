@@ -1,13 +1,12 @@
-import Header from "@/components/Header"
-import Hero from "@/components/Hero"
-import Routes from "@/components/Routes"
-import HowItWorks from "@/components/HowItWorks"
-import Pricing from "@/components/Pricing"
-import Features from "@/components/Features"
-import Notice from "@/components/Notice"
-import Faq from "@/components/Faq"
-import Cta from "@/components/Cta"
-import Footer from "@/components/Footer"
+import Cta from '@/components/Cta';
+import Faq from '@/components/Faq';
+import Features from '@/components/Features';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import Hero from '@/components/Hero';
+import HowItWorks from '@/components/HowItWorks';
+import Notice from '@/components/Notice';
+import Routes from '@/components/Routes';
 
 export default function Page() {
   return (
@@ -25,5 +24,5 @@ export default function Page() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import Container from "@/components/Container"
+import Container from '@/components/Container';
 
 export default function Footer() {
   return (
@@ -8,5 +8,5 @@ export default function Footer() {
         <p>Đơn vị tư vấn giải pháp: Viettel</p>
       </Container>
     </footer>
-  )
+  );
 }

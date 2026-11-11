@@ -1,49 +1,49 @@
-"use client"
+'use client';
 
-import { useMemo } from "react"
-import { Controller, useForm, useWatch } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { MAX_TICKETS_PER_ORDER, prices, routes, vnd } from "@/data/content"
+import { MAX_TICKETS_PER_ORDER, prices, routes, vnd } from '@/data/content';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 const todayISO = () => {
-  const d = new Date()
-  const pad = (n: number) => String(n).padStart(2, "0")
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 export const schema = z
   .object({
-    route: z.string().min(1, "Vui lòng chọn tuyến"),
+    route: z.string().min(1, 'Vui lòng chọn tuyến'),
     date: z
       .string()
-      .min(1, "Vui lòng chọn ngày đi")
-      .refine((v) => v >= todayISO(), "Ngày đi không được ở quá khứ"),
+      .min(1, 'Vui lòng chọn ngày đi')
+      .refine((v) => v >= todayISO(), 'Ngày đi không được ở quá khứ'),
     adult: z.number().int().min(0),
     child: z.number().int().min(0),
-    mode: z.enum(["ghep", "bao"]),
+    mode: z.enum(['ghep', 'bao']),
   })
   .superRefine((v, ctx) => {
-    const total = v.adult + v.child
+    const total = v.adult + v.child;
     if (total < 1) {
       ctx.addIssue({
-        code: "custom",
-        path: ["adult"],
-        message: "Vui lòng chọn ít nhất 1 vé",
-      })
+        code: 'custom',
+        path: ['adult'],
+        message: 'Vui lòng chọn ít nhất 1 vé',
+      });
     } else if (total > MAX_TICKETS_PER_ORDER) {
       ctx.addIssue({
-        code: "custom",
-        path: ["adult"],
+        code: 'custom',
+        path: ['adult'],
         message: `Mỗi lượt mua tối đa ${MAX_TICKETS_PER_ORDER} vé. Đoàn đông hơn vui lòng tách thành nhiều đơn hàng.`,
-      })
+      });
     }
-  })
+  });
 
-export type FormValues = z.infer<typeof schema>
+export type FormValues = z.infer<typeof schema>;
 
 const field =
-  "w-full rounded-lg border border-black/15 bg-white px-4 py-3 text-base text-ink outline-none focus:border-jade-600 focus:ring-2 focus:ring-jade-100"
+  'w-full rounded-lg border border-black/15 bg-white px-4 py-3 text-base text-ink outline-none focus:border-jade-600 focus:ring-2 focus:ring-jade-100';
 
 export default function BookingForm() {
   const {
@@ -53,29 +53,29 @@ export default function BookingForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
       route: routes[0].id,
-      date: "",
+      date: '',
       adult: 2,
       child: 0,
-      mode: "ghep",
+      mode: 'ghep',
     },
-  })
+  });
 
   const [adult = 0, child = 0, mode] = useWatch({
     control,
-    name: ["adult", "child", "mode"],
-  })
+    name: ['adult', 'child', 'mode'],
+  });
 
   const estimate = useMemo(
     () => adult * prices.adult.weekday + child * prices.child.weekday,
-    [adult, child]
-  )
+    [adult, child],
+  );
 
   async function onSubmit(values: FormValues) {
     // TODO: chuyển sang bước nhập thông tin người mua và thanh toán
-    console.log(values)
+    console.log(values);
   }
 
   return (
@@ -88,10 +88,8 @@ export default function BookingForm() {
       <h2 className="mb-5 text-xl font-bold">Đặt vé nhanh</h2>
       <div className="space-y-4">
         <label className="block">
-          <span className="mb-1 block text-sm font-semibold">
-            Tuyến tham quan
-          </span>
-          <select className={field} {...register("route")}>
+          <span className="mb-1 block text-sm font-semibold">Tuyến tham quan</span>
+          <select className={field} {...register('route')}>
             {routes.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name}
@@ -108,7 +106,7 @@ export default function BookingForm() {
             min={todayISO()}
             aria-invalid={!!errors.date}
             className={field}
-            {...register("date")}
+            {...register('date')}
           />
           <FieldError message={errors.date?.message} />
         </label>
@@ -118,11 +116,7 @@ export default function BookingForm() {
             name="adult"
             control={control}
             render={({ field: f }) => (
-              <Counter
-                label="Người lớn"
-                value={f.value}
-                onChange={f.onChange}
-              />
+              <Counter label="Người lớn" value={f.value} onChange={f.onChange} />
             )}
           />
           <Controller
@@ -136,9 +130,7 @@ export default function BookingForm() {
         <FieldError message={errors.adult?.message ?? errors.child?.message} />
 
         <fieldset>
-          <legend className="mb-1 text-sm font-semibold">
-            Hình thức đi đò
-          </legend>
+          <legend className="mb-1 text-sm font-semibold">Hình thức đi đò</legend>
           <Controller
             name="mode"
             control={control}
@@ -146,8 +138,8 @@ export default function BookingForm() {
               <div className="grid grid-cols-2 gap-3">
                 {(
                   [
-                    ["ghep", "Ghép đò"],
-                    ["bao", "Bao thuyền"],
+                    ['ghep', 'Ghép đò'],
+                    ['bao', 'Bao thuyền'],
                   ] as const
                 ).map(([v, l]) => (
                   <button
@@ -156,8 +148,8 @@ export default function BookingForm() {
                     onClick={() => f.onChange(v)}
                     className={`rounded-lg border px-4 py-3 text-sm font-semibold ${
                       f.value === v
-                        ? "border-jade-600 bg-jade-50 text-jade-700"
-                        : "border-black/15 hover:bg-black/5"
+                        ? 'border-jade-600 bg-jade-50 text-jade-700'
+                        : 'border-black/15 hover:bg-black/5'
                     }`}
                   >
                     {l}
@@ -166,7 +158,7 @@ export default function BookingForm() {
               </div>
             )}
           />
-          {mode === "bao" && (
+          {mode === 'bao' && (
             <p className="mt-2 text-xs text-ink/60">
               Bao thuyền được cộng thêm phụ phí theo quy định của Ban Quản lý.
             </p>
@@ -174,9 +166,7 @@ export default function BookingForm() {
         </fieldset>
 
         <div className="flex items-end justify-between border-t border-black/10 pt-4">
-          <span className="text-sm text-ink/60">
-            Tạm tính (giá ngày thường)
-          </span>
+          <span className="text-sm text-ink/60">Tạm tính (giá ngày thường)</span>
           <strong className="text-2xl text-brand-600">{vnd(estimate)}</strong>
         </div>
 
@@ -192,19 +182,16 @@ export default function BookingForm() {
         </p>
       </div>
     </form>
-  )
+  );
 }
 
 function FieldError({ message }: { message?: string }) {
-  if (!message) return null
+  if (!message) return null;
   return (
-    <p
-      role="alert"
-      className="mt-1 rounded-lg bg-brand-50 p-3 text-sm text-brand-700"
-    >
+    <p role="alert" className="mt-1 rounded-lg bg-brand-50 p-3 text-sm text-brand-700">
       {message}
     </p>
-  )
+  );
 }
 
 function Counter({
@@ -212,9 +199,9 @@ function Counter({
   value,
   onChange,
 }: {
-  label: string
-  value: number
-  onChange: (n: number) => void
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
 }) {
   return (
     <div>
@@ -239,5 +226,5 @@ function Counter({
         </button>
       </div>
     </div>
-  )
+  );
 }
